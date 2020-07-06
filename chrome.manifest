@@ -1,0 +1,9 @@
+manifest components/interfaces.manifest
+manifest components/CardDAVDirectoryFactory.manifest
+manifest components/CardDAVDirectory.manifest
+manifest components/ContextManager.manifest
+manifest components/NotificationManager.manifest
+manifest components/SOGoConnectorAutocompleteSearch.manifest
+manifest components/SyncProgressManager.manifest
+manifest chrome/contacts.manifest
+manifest chrome/fr.manifest

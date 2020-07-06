@@ -1,0 +1,101 @@
+
+.bandeau{
+  height:50px;
+  background-color: #CCE1A2;
+}
+
+.bandeau-titre{
+  margin-left:10px;
+  margin-top:14px;
+  font-size: 14pt;
+  font-family: Arial;
+  color:#385C02;
+}
+
+/* boite a propos */
+.contactsdav-apropos{
+  background-color:white;
+}
+
+#apropos-cadre{
+  padding-top:20px;
+  margin-left:10px;
+  margin-right:10px;
+}
+
+.aproposdesc{
+  font-family:arial;
+  font-size:12px;
+  font-weight:600;
+}
+
+.apropos-libministere{
+
+  font-family:arial;
+  font-size:12px;
+  font-weight:600;
+  margin-bottom: 2px;
+  color:#385C02;
+
+  border-bottom-style:solid;
+  border-bottom-width:1px;
+  border-bottom-color:blue;
+}
+
+.apropos-libministere2{
+  font-family:arial;
+  font-size:12px;
+  font-weight:600;
+  margin-top:24px;
+  margin-bottom: 2px;
+  color:rgb(72,33,64);
+}
+
+
+#apropos-collogo{
+  padding-top:60px;
+}
+
+#apropos-cadredesc{
+  padding-left:4px;
+}
+
+#contactsdav-aff #bandeau-titre{
+  margin-left:30px;
+}
+
+#contactsdav-aff #affichage-liste{
+  padding:2px;
+  margin:6px
+}
+
+/* bouton affichage des carnets dans la barre d'outils */
+#btaffcarnets {
+  list-style-image: url("chrome://messenger/skin/addressbook/icons/addrbook.png");
+}
+
+toolbar[iconsize="small"] #btaffcarnets {
+  list-style-image: url("chrome://messenger/skin/addressbook/icons/addrbook.png");
+}
+
+/* bouton affichage des carnets dans la barre d'outils */
+#majadrcol {
+  list-style-image: url("chrome://messenger/skin/addressbook/icons/addrbook.png");
+}
+
+toolbar[iconsize="small"] #majadrcol {
+  list-style-image: url("chrome://messenger/skin/addressbook/icons/addrbook.png");
+}
+
+
+#majadrcol{
+  visibility:collapse;
+}
+
+#btanais {
+  list-style-image: url("chrome://anais/skin/img/annuaire.png");
+}
+
+toolbar[iconsize="small"] #btanais {
+  list-style-image: url("chrome://anais/skin/img/annuaire.png");
+}

@@ -1,0 +1,26 @@
+
+<!-- apropos.xul -->
+<!ENTITY contactsdav.apropos.titre "À propos de Contacts">
+<!ENTITY contactsdav.apropos.text1 "Accès aux contacts Mél">
+<!ENTITY contactsdav.apropos.text2 "Version : &contactsdav.numver;">
+<!ENTITY contactsdav.apropos.text3 "Publié le : &contactsdav.datever;">
+<!ENTITY contactsdav.numver "3.5">
+<!ENTITY contactsdav.datever "17/1/2020">
+
+
+<!ENTITY affichage.titre "Affichage des carnets">
+<!ENTITY affichage.bandeau "Modifier l'affichage des carnets">
+
+<!ENTITY contactsdav.affmasque "Ne pas afficher">
+<!ENTITY contactsdav.affcarnets "Affichage des carnets...">
+
+<!ENTITY contactsdav.maj "Mettre à jour">
+<!ENTITY contactsdav.majadr "Mise à jour des adresses collectées">
+<!ENTITY contactsdav.btdemarrer "Cliquer sur Démarrer pour mettre à jour">
+<!ENTITY contactsdav.demarrer "Démarrer">
+<!ENTITY contactsdav.quitter "Quitter">
+
+<!ENTITY majadrcol.btlib "Collectées">
+<!ENTITY majadrcol.bttip "Mise à jour des adresses collectées">
+
+<!ENTITY contactsdav.btpartage "Partager mes contacts">

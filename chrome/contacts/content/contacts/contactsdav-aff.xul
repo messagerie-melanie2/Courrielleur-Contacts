@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!--
+Projet contactsdav : choix des carnets
+mantis 0003333: Permettre de choisir les carnets d'adresses horde affichés
+Cete-Lyon 2016
+-->
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://contacts/skin/contactsdav.css" type="text/css"?>
+
+<!DOCTYPE window SYSTEM "chrome://contacts/locale/contactsdav.dtd">
+
+<window title="&affichage.titre;"
+        id="contactsdav-aff"
+        class="contactsdav-apropos"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        width="500px" height="300px"
+        onload="affOnLoad();">
+        
+  <script type="application/x-javascript" src="chrome://contacts/content/contactsdav-aff.js"/>
+  <script type="application/x-javascript" src="chrome://contacts/content/contactsdav-utils.js"/>
+
+  <keyset id="keys">
+    <key keycode="VK_ESCAPE" oncommand="window.close();"/>
+  </keyset>
+
+  <vbox id="bandeau" class="bandeau">
+    <description id="bandeau-titre" class="bandeau-titre">&affichage.bandeau;</description>
+  </vbox>
+
+  <hbox id="affichage-cadre" flex="1">
+
+  <listbox id="affichage-liste" flex="1">
+  </listbox>
+
+  </hbox>
+
+  <hbox align="right">
+    <button label="Valider" oncommand="affValider();"/>
+    <button label="Quitter" oncommand="Quitter();"/>
+  </hbox>
+  
+</window>

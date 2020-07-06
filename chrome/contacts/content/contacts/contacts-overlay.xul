@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+
+<?xml-stylesheet href="chrome://messenger/skin/addressbook/addressbook.css" type="text/css"?>
+<?xml-stylesheet href="chrome://contacts/skin/contactsdav.css" type="text/css"?>
+
+<!DOCTYPE window [
+<!ENTITY % contactsDTD SYSTEM "chrome://contacts/locale/contactsdav.dtd">
+%contactsDTD;
+<!ENTITY % anaisDTD SYSTEM "chrome://anais/locale/anais.dtd">
+%anaisDTD;
+]>
+
+<overlay id="addressbook.contacts.overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script type="application/javascript" src="chrome://courrielleur/content/messenger-overlay.js"/>
+  <script type="application/javascript" src="chrome://contacts/content/contacts-overlay.js"/>
+  <script type="application/x-javascript" src="chrome://contacts/content/contactsdav-config.js"/>
+  <script type="application/javascript" src="chrome/messenger/content/messenger/addressbook/abCommon.js"/>     
+  <script type="application/javascript" src="chrome://sogo-connector/content/general/preference.service.addressbook.groupdav.js"/>
+  <script type="application/x-javascript" src="chrome://anais/content/anaismozutils.js"/>
+
+  <menu id="menu_View">
+    <menupopup id="menu_View_Popup">
+      <menuseparator/>
+      <menuitem id="cm2masque-menu" label="&contactsdav.affmasque;" oncommand="AffichageMasquer();"/>
+      <menuitem id="cm2carnets-menu" label="&contactsdav.affcarnets;" oncommand="AffichageCarnets();"/>
+    </menupopup>
+  </menu>
+
+  <menupopup id="dirTreeContext">
+    <menuitem id="cm2maj-popup" insertafter="dirTreeContext-properties"
+              label="&contactsdav.maj;" oncommand="cm2MajAdrCol();"/>
+    <menuitem id="cm2masque-popup" insertafter="dirTreeContext-properties"
+              label="&contactsdav.affmasque;" oncommand="AffichageMasquer();"/>
+  </menupopup>
+  
+  <toolbarpalette id="AddressBookToolbarPalette">
+      <toolbarbutton class="toolbarbutton-1" id="btaffcarnets"
+                     label="Carnets" oncommand="AffichageCarnets();"
+                     tooltiptext="&contactsdav.affcarnets;"/>
+      <toolbarbutton class="toolbarbutton-1" id="majadrcol"
+                   label="&majadrcol.btlib;" oncommand="cm2MajAdrCol();"
+                   tooltiptext="&majadrcol.bttip;"/>
+      <toolbarbutton class="toolbarbutton-1" id="btanais"
+                   label="&btanais.lib;" oncommand="OuvreAnaisDepuisCarnet();"
+                   tooltiptext="&btanais.bulle;"/>
+  </toolbarpalette>      
+
+  <toolbar id="ab-bar2"
+           defaultset="button-newcard,button-newlist,separator,button-editcard,button-newmessage,separator,button-abdelete,separator,btaffcarnets,btanais,majadrcol,spring,search-container">
+  </toolbar> 
+
+  <vbox id="dirTreeBox">
+    <hbox id="cm2btlnhorde">
+      <hbox flex="1"/>
+      <button label="&contactsdav.btpartage;" oncommand="cm2PartageContacts();"/>
+      <hbox flex="1"/>
+    </hbox>
+  </vbox>
+
+</overlay>
