@@ -234,7 +234,8 @@ function saveCard(isNewCard) {
     }
     catch(e) {
       dump("saveCard exception:"+e);
-      gSCCardValues.messengerWindow.exceptionHandler(null, "saveCard", e);
+      //exceptionHandler n'existe pas ! 0005949: Bouton OK de la carte de visite valide mais ne ferme pas la fenêtre
+      //gSCCardValues.messengerWindow.exceptionHandler(null, "saveCard", e);
     }
 }
 
