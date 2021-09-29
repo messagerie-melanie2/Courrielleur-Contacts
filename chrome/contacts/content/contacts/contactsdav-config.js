@@ -208,9 +208,9 @@ function cm2davCarnetExiste(infos) {
 */
 function cm2davUidReduit(uid) {
   
-  let pos=uid.indexOf(".-.");
-  if (-1!=pos)
-    return uid.substr(0,pos);
+  const compos=SplitUserBalp(uid);
+  if (compos && 2==compos.length)
+    return compos[0];
 
   return uid;
 }
