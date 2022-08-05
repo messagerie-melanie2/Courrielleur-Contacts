@@ -9,7 +9,7 @@ pref("courrielleur.contactsdav.refreshInterval", 60);
 //activation des traces dans la console (=>true)
 pref("courrielleur.contactsdav.traces", false);
 
-// 0004438: Mise à jour des adresses collectées
+// 0004438: Mise a jour des adresses collectées
 // service actif
 pref("courrielleur.majadrcol", true);
 // detecter tous les n jours
