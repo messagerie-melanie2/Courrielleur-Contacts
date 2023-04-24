@@ -1,7 +1,7 @@
 
 <!-- apropos.xul -->
 <!ENTITY contactsdav.apropos.titre "À propos de Contacts">
-<!ENTITY contactsdav.apropos.text1 "Accès aux contacts Mél">
+<!ENTITY contactsdav.apropos.text1 "Accès aux contacts MCE">
 <!ENTITY contactsdav.apropos.text2 "Version : &contactsdav.numver;">
 <!ENTITY contactsdav.apropos.text3 "Publié le : &contactsdav.datever;">
 <!ENTITY contactsdav.numver "3.5">
