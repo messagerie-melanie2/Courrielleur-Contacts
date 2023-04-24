@@ -1,8 +1,8 @@
 
 //nom du serveur Cm2Dav
-pref("courrielleur.contactsdav.serveur.nom", "syncon.s2.m2.e2.rie.gouv.fr");
+pref("courrielleur.contactsdav.serveur.nom", "mceweb2.si.minint.fr");
 //racine des carnets sur le serveur
-pref("courrielleur.contactsdav.serveur.racine", "contacts.php/carnets/");
+pref("courrielleur.contactsdav.serveur.racine", "dav/carddav.php/addressbooks/");
 //preference intervalle de rafraichissement en minutes
 pref("courrielleur.contactsdav.refreshInterval", 60);
 
