@@ -526,9 +526,9 @@ Cm2MajAdrCol.prototype={
     
     // cas prenom.nom.-.partage@test
     // chercher sur partage@test
-    const compos=SplitUserBalp(mail);
-    if (compos && 2==compos.length){
-      adr=compos[1];
+    let pos=mail.indexOf(".-.");
+    if (-1!=pos){
+      adr=mail.substr(pos+3);
       cm2MajAdrDebug("Cm2MajAdrCol ChercheEntree boite partagee:"+mail);
     }
     
