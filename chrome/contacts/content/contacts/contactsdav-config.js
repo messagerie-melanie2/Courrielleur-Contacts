@@ -499,12 +499,15 @@ function cm2davGetInfosFromHref(href) {
   let srv=cm2davGetCm2DavSrvName();
   let url=CM2DAV_PROTO+srv+href;
   infos["url"]=url;
+	let pos=compos.length-1;
+	if (compos[pos]=="")
+		pos--;
   //uid
-  infos["uid"]=compos[3];
+  infos["uid"]=compos[pos-1];
   //bookid
-  infos["bookid"]=compos[4];
+  infos["bookid"]=compos[pos];
   //bookid
-  infos["prefid"]=cm2davDirName(compos[4]);
+  infos["prefid"]=cm2davDirName(infos["bookid"]);
 
   return infos;
 }
