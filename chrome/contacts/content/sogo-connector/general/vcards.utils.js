@@ -233,6 +233,10 @@ function importFromVcard(vCardString) {
     if (!vCardString || vCardString == "")
         dump("'vCardString' is empty\n" + backtrace() + "\n");
     else {
+			// cas format 4.0 => format 3.0 pour prise en compte par SOGO
+			vCardString=vCardString.replace("TEL;TYPE=\"work,voice\"", "TEL;TYPE=work");
+			vCardString=vCardString.replace("TEL;TYPE=\"home,voice\"", "TEL;TYPE=home");
+			
         let vcard = versitParse(vCardString);
         // let cardDump = dumpObject(vcard);
         // logInfo("vcard dump:\n" + cardDump);
