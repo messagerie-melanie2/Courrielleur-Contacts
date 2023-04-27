@@ -139,7 +139,7 @@ function sogoWebDAV(url, target, data, synchronous, asJSON) {
     else {
         this.synchronous = synchronous;
     }
-    
+
     this.requestJSONResponse = false;
     this.requestXMLResponse = false;
 
@@ -150,7 +150,7 @@ function sogoWebDAV(url, target, data, synchronous, asJSON) {
 }
 
 sogoWebDAV.prototype = {
-    
+
     QueryInterface: XPCOMUtils.generateQI([Components.interfaces.nsIInterfaceRequestor]),
 
     _makeURI: function _makeURI(url) {
@@ -161,16 +161,18 @@ sogoWebDAV.prototype = {
 
     // See: http://mxr.mozilla.org/comm-central/source/calendar/base/modules/calProviderUtils.jsm
     getInterface: function sogoWebDAV_getInterface(aIID) {
-        
+
         if (aIID.equals(Components.interfaces.nsIProgressEventSink)) {
             return { onProgress: function sogoWebDAV_onProgress(aRequest, aContext, aProgress, aProgressMax) {},
                      onStatus: function sogoWebDAV_onStatus(aRequest, aContext, aStatus, aStatusArg) {} };
         }
-        
+
         return cal.provider.InterfaceRequestor_getInterface.apply(this, arguments);
     },
 
     _sendHTTPRequest: function(method, body, headers) {
+			
+			//dump("*** sogoWebDAV _sendHTTPRequest method:'"+method+"' - body:'"+body+"'\n");
        /* let IOService = Components.classes["@mozilla.org/network/io-service;1"]
                                   .getService(Components.interfaces.nsIIOService);
         let channel = IOService.newChannelFromURI(this._makeURI(this.url));*/
@@ -263,7 +265,7 @@ sogoWebDAV.prototype = {
         }
         catch(e) {
             dump("sogoWebDAV: trapped exception: " + e + "\n");
-            setTimeout("throw new Error('sogoWebDAV could not download calendar. Try disabling proxy server.')",0); 
+            setTimeout("throw new Error('sogoWebDAV could not download calendar. Try disabling proxy server.')",0);
             status = 499;
         }
         dump("GOT STATUS: " + status + "\n");
@@ -317,6 +319,7 @@ sogoWebDAV.prototype = {
                         response = responseText;
                     }
                 }
+								//dump("*** sogoWebDAV _handleHTTPResponse status:'"+status+"' - response:'"+response.toString()+"' - headers:'"+headers.toString()+"'");
             }
             if (this.target && this.target.onDAVQueryComplete) {
                 this.target.onDAVQueryComplete(status, response, headers, this.cbData);
@@ -348,9 +351,13 @@ sogoWebDAV.prototype = {
 	    }
             this._sendHTTPRequest(operation, null, headers);
         }
-        
+
         else if (operation == "PUT" || operation == "POST") {
-          if(parameters.contentType.indexOf("text/vcard") == 0) {
+
+					let bList=cm2DetecteListeVCARD(parameters.data);
+					//if (bList) dump("*** load liste\n");
+
+          if(!bList && parameters.contentType.indexOf("text/vcard") == 0) {
                     if (this.cbData.data.getProperty("groupDavKey", "") == "") {
                         dump("NOTICE: uploading new vcard with empty key\n");
                         this._sendHTTPRequest(operation,
@@ -375,8 +382,8 @@ sogoWebDAV.prototype = {
                           "If-None-Match": "*" });
                         }
                     }
-          } else if (0==parameters.contentType.indexOf("text/x-vlist")) {
-            
+          } else if (bList || 0==parameters.contentType.indexOf("text/x-vlist")) {
+
             let list=this.cbData.data;
             let mailListURI=list.mailListURI;
             //dump("*** sogoWebDAV.js load uri:"+mailListURI+"\n");
@@ -420,7 +427,7 @@ sogoWebDAV.prototype = {
                                   parameters.data,
                                   { "content-type": parameters.contentType });
         }*/
-        
+
         else if (operation == "PROPFIND") {
             let headers = { "depth": (parameters.deep
                                       ? "1": "0"),

@@ -366,7 +366,7 @@ let deleteManager = {
                 || code == 604)) {
             // 			dump("code: " + code + "\n");
             if (data.component.isMailList) {
-                // 				dump("deleting list\n");
+                dump("deleteManager deleting list\n");
                 let mailListURI = ((data.component
                                     instanceof Components.interfaces.nsIAbCard)
                                    ? data.component.mailListURI
@@ -384,6 +384,7 @@ let deleteManager = {
                 // gAbView.deleteSelectedCards();
             }
             else {
+							dump("deleteManager deleting card\n");
                 let cards = Components.classes["@mozilla.org/array;1"]
                                       .createInstance(Components.interfaces.nsIMutableArray);
                 cards.appendElement(data.component, false);

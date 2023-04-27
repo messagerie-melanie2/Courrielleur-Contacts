@@ -236,14 +236,14 @@ function importFromVcard(vCardString) {
 			// cas format 4.0 => format 3.0 pour prise en compte par SOGO
 			vCardString=vCardString.replace("TEL;TYPE=\"work,voice\"", "TEL;TYPE=work");
 			vCardString=vCardString.replace("TEL;TYPE=\"home,voice\"", "TEL;TYPE=home");
-			
-        let vcard = versitParse(vCardString);
-        // let cardDump = dumpObject(vcard);
-        // logInfo("vcard dump:\n" + cardDump);
-        card = CreateCardFromVCF(vcard);
+
+			let vcard = versitParse(vCardString);
+			// let cardDump = dumpObject(vcard);
+			// logInfo("vcard dump:\n" + cardDump);
+			card = CreateCardFromVCF(vcard);
     }
 
-    // dump("card content:\n" + vCardString + "\n");
+    dump("card content:\n" + vCardString + "\n");
 
     return card;
 }
@@ -287,6 +287,7 @@ function CreateCardFromVCF(vcard) {
         }
 
         let values = decodedValues(vcard[i]["values"], charset, encoding);
+
         InsertCardData(card, tag, parameters, values);
     }
 
@@ -320,6 +321,7 @@ let _insertCardMethods = {
                        "Department": values[1] });
     },
     tel: function(props, parameters, values) {
+			//dump("*** _insertCardMethods tel - parameters: " + parameters["type"] + "  values: " + values[0] + "\n");
         let abTypes = { "FAX": "FaxNumber",
                         "CELL": "CellularNumber",
                         "PAGER": "PagerNumber",
@@ -330,7 +332,7 @@ let _insertCardMethods = {
         let cardCheckTypes = [ "FAX", "CELL", "PAGER", "HOME", "WORK" ];
         if (parameters["type"] && parameters["type"].length > 0) {
             let types = this._upperTypes(parameters["type"]);
-
+						// dump("*** _insertCardMethods types:" + types.join("|") + "\n");
             for (let i = 0; !knownType && i < cardCheckTypes.length; i++) {
                 let type = cardCheckTypes[i];
                 if (types.indexOf(type) > -1) {
@@ -339,17 +341,20 @@ let _insertCardMethods = {
                         || (!props[abType] || props[abType].length == 0)) {
                         props[abType] = values[0];
                     }
+										//dump("*** _insertCardMethods knownType = true \n");
                     knownType = true;
                 }
             }
         }
 
         if (!knownType) {
+					//dump("*** _insertCardMethods knownType = false \n");
             let addTypes = [ "WorkPhone", "HomePhone" ];
             for (let i = 0; !knownType && i < addTypes.length; i++) {
                 let type = addTypes[i];
                 if (!props[type] || props[type].length == 0) {
                     props[type] = values[0];
+										//dump("*** _insertCardMethods knownType = true - type:'"+type+ "'  values: '" + values[0] +"'\n");
                     knownType = true;
                 }
             }
@@ -518,6 +523,7 @@ let _insertCardMethods = {
 function InsertCardData(card, tag, parameters, values) {
     // dump("InsertCardData: " + tag + "\n");
     // dump("  values: " + values.join("|") + "\n");
+		//dump("*** InsertCardData: " + tag + "  parameters: " + parameters.toString() + "  values: " + values.join("|") + "\n");
 
     let properties = {};
     properties.extend = function Object_extend(otherObj) {
@@ -743,7 +749,7 @@ function card2vcard(card) {
     if (secondEmail.length) {
         vCard += foldedLine("EMAIL;TYPE=home:"
                             + escapedForCard(secondEmail)) + "\r\n";
-    }    
+    }
     if (thirdEmail.length) {
       vCard += foldedLine("EMAIL;TYPE=email3:"
                           + escapedForCard(thirdEmail)) + "\r\n";
@@ -830,11 +836,11 @@ function card2vcard(card) {
     //cm2 - ajout propriete specifique pour transmettre l'etag en cas de mise a jour
     let etag=card.getProperty("X-CM2DAV-ETAG", "-1");
     if (etag && "-1"!=etag){
-      dump("*** card2vcard X-CM2DAV-ETAG etag:"+etag+"\n");
+      //dump("*** card2vcard X-CM2DAV-ETAG etag:"+etag+"\n");
       vCard+=foldedLine("X-CM2DAV-ETAG:"+escapedForCard(etag))+"\r\n";
       card.deleteProperty("X-CM2DAV-ETAG");
     }
-    
+
     let remainingProps = card.properties;
     while (remainingProps.hasMoreElements()) {
         let prop = remainingProps.getNext().QueryInterface(Components.interfaces.nsIProperty);
@@ -858,7 +864,7 @@ function card2vcard(card) {
         }
     }
 
-    vCard += "END:VCARD\r\n\r\n";
+    vCard += "END:VCARD";
 
     return vCard;
 }
@@ -1056,7 +1062,7 @@ function deletePhotoFile(photoName, inSOGoCache) {
     }
 }
 
-/* VLIST */
+/* VLIST - version SOGO */
 function updateListFromVList(listCard, vListString, cards) {
     let abManager = Components.classes["@mozilla.org/abmanager;1"]
                               .getService(Components.interfaces.nsIAbManager);
@@ -1109,6 +1115,54 @@ function updateListFromVList(listCard, vListString, cards) {
     return listUpdated;
 }
 
+// version pour sabredav (VCARD) de updateListFromVList (SOGO) modifiée
+function updateListFromVCard(listCard, vListString, cards) {
+
+	let abManager = Components.classes["@mozilla.org/abmanager;1"]
+														.getService(Components.interfaces.nsIAbManager);
+	let listURI = listCard.mailListURI;
+	let list = abManager.getDirectory(listURI);
+	let listUpdated = false;
+
+	list.addressLists.clear();
+	let parsedString = versitParse(vListString);
+	for (let i = 0; i < parsedString.length; i++) {
+			let line = parsedString[i];
+			//dump("*** line.tag:'"+line.tag+"' - values:'"+line.values.join()+"'\n");
+			if (line.tag == "fn") {
+					listCard.displayName = line.values[0];
+					listCard.lastName = line.values[0];
+					list.dirName = line.values[0];
+			}
+			else if (line.tag == "nickname") {
+					listCard.setProperty("NickName", line.values[0]);
+					list.listNickName = line.values[0];
+			}
+			else if (line.tag == "description") {
+					listCard.setProperty("Notes", line.values[0]);
+					list.description = line.values[0];
+			}
+			else if (line.tag == "member") {
+				if (0==line.values[0].indexOf("urn:uuid:")){
+					let uidMembre=line.values[0].replace("urn:uuid:", "");
+					card = cards[uidMembre];
+					//dump("*** card:"+card+"\n");
+					if (card)
+							list.addressLists.appendElement(card, false);
+					else {
+							dump("card with uid '" + line.values[0]
+									 + "' was not found in directory");
+					}
+					listUpdated = true;
+				}
+			}
+	}
+
+	return listUpdated;
+}
+
+
+
 function _findCardWithEmail(cards, email) {
     let card = null;
 
@@ -1122,6 +1176,7 @@ function _findCardWithEmail(cards, email) {
     return card;
 }
 
+/* version sogo */
 function list2vlist(uid, listCard) {
     let vList = ("BEGIN:VLIST\r\n"
                  + "PRODID:-//Inverse inc.//SOGo Connector 1.0//EN\r\n"
@@ -1166,4 +1221,59 @@ function list2vlist(uid, listCard) {
     // dump("vList:\n" + vList + "\n");
 
     return vList;
+}
+
+
+// version pour sabredav (VCARD) de list2vlist (SOGO) modifiée
+function list2vcard(uid, listCard) {
+    let vList = ("BEGIN:VCARD\r\n"
+                 //+ "VERSION:4.0\r\n"
+                 + "VERSION:3.0\r\n"
+								 + "PRODID:-//Inverse inc.//SOGo Connector 1.0//EN\r\n"
+                 + "UID:" + uid + "\r\n"
+								 + "X-ADDRESSBOOKSERVER-KIND:GROUP\r\n"
+								 + "KIND:group\r\n");
+    vList += "FN:" + listCard.getProperty("DisplayName", "") + "\r\n";
+    let data = listCard.getProperty("NickName", "");
+    if (data.length)
+      vList += "NICKNAME:" + data + "\r\n";
+    data = "" + listCard.getProperty("Notes", "");
+    if (data.length)
+      vList += "DESCRIPTION:" + data + "\r\n";
+
+    let abManager = Components.classes["@mozilla.org/abmanager;1"]
+                              .getService(Components.interfaces.nsIAbManager);
+    let listDir = abManager.getDirectory(listCard.mailListURI);
+    let cards = listDir.childCards;
+    dump("cards: " + cards + "\n");
+    while (cards.hasMoreElements()) {
+			let card = cards.getNext().QueryInterface(Components.interfaces.nsIAbCard);
+			let uid = card.getProperty("CardUID", "");
+			//dump("*** list2vcard member uid:'"+uid+"'\n");
+			if (uid && uid.length){
+				let entry = "MEMBER:urn:uuid:"+uid+ "\r\n";
+				vList += entry;
+			}
+			else {
+				dump("card has no uid\n"
+						 + "  primaryEmail: " + card.primaryEmail + "\n"
+						 + "  displayName: " + card.displayName + "\n");
+			}
+    }
+
+    vList += "END:VCARD";
+    // dump("vList:\n" + vList + "\n");
+
+    return vList;
+}
+
+/* detecte liste au format vcard
+	vcard : string
+	retour true si liste
+*/
+function cm2DetecteListeVCARD(vcard){
+	return (vcard && ""!=vcard &&
+					(vcard.includes("X-ADDRESSBOOKSERVER-KIND:GROUP")
+					 || vcard.includes("KIND:group")
+					 || vcard.includes("KIND:GROUP")));
 }
