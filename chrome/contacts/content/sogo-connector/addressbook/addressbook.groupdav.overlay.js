@@ -133,7 +133,7 @@ dirPaneControllerOverlay.prototype = {
 
     isCommandEnabled: function(command) {
         let result = false;
-        
+
       let connecte=cm2davTestConnexion();
       if (false==connecte) {
         return result;
@@ -245,7 +245,7 @@ abDirTreeObserver._getDroppedCardsKeysFromSession = function(dragSession, abView
 		trans.addDataFlavor("text/vcard");
 
     for (let i = 0; i < dragSession.numDropItems; i++) {
-        dragSession.getData(trans, i);	
+        dragSession.getData(trans, i);
         let dataObj = {};
         let bestFlavor = {};
         let len = {};
@@ -456,14 +456,16 @@ function _deleteGroupDAVComponentWithKey(prefService, key,
 
 function SCAbConfirmDelete(types) {
     let confirm = false;
-
+		//Services.console.logStringMessage("*** SCAbConfirmDelete types:"+types);
     if (types != kNothingSelected) {
         let promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                                       .getService(Components.interfaces.nsIPromptService);
 
         let confirmDeleteMessage;
         let numSelectedItems=gAbView.selection.count;
+				//Services.console.logStringMessage("*** SCAbConfirmDelete numSelectedItems:"+numSelectedItems);
         let itemName;
+				let selectedDir = getSelectedDirectory();
 
         if (types == kListsAndCards)
             confirmDeleteMessage = gAddressBookBundle.getString("confirmDelete2orMoreContactsAndLists");
@@ -480,13 +482,21 @@ function SCAbConfirmDelete(types) {
                 confirmDeleteMessage = gAddressBookBundle.getString("confirmDelete2orMoreContacts");
         }
         else {
-          confirmDeleteMessage = gAddressBookBundle.getString("confirmDeleteThisMailingList");
-          let theCard=GetSelectedAbCards()[0];
-          itemName=theCard.displayName;
+					//Services.console.logStringMessage("*** SCAbConfirmDelete selectedDir.isMailList:"+(selectedDir.isMailList ?"true":"false"));
+					confirmDeleteMessage = gAddressBookBundle.getString("confirmDeleteThisMailingList");
+					//Services.console.logStringMessage("*** SCAbConfirmDelete confirmDeleteMessage:"+confirmDeleteMessage);
+					if (selectedDir.isMailList){
+						itemName=selectedDir.dirName;
+					}
+					else{
+						let theCard=GetSelectedAbCards()[0];
+						itemName=theCard.displayName;
+					}
+					//Services.console.logStringMessage("*** SCAbConfirmDelete itemName:"+itemName);
         }
 
         // parametre
-        if (1==numSelectedItems){
+        if (selectedDir.isMailList || 1==numSelectedItems){
 
           confirmDeleteMessage=confirmDeleteMessage.replace("#1", itemName);
 
@@ -496,6 +506,8 @@ function SCAbConfirmDelete(types) {
           confirmDeleteMessage=confirmDeleteMessage.replace("#1", numSelectedItems);
         }
 
+				//Services.console.logStringMessage("*** SCAbConfirmDelete confirmDeleteMessage:"+confirmDeleteMessage);
+
         confirm = promptService.confirm(window, null, confirmDeleteMessage);
     }
 
@@ -504,7 +516,7 @@ function SCAbConfirmDelete(types) {
 
 function SCAbDelete() {
     let deletePerformed = false;
-
+		//Services.console.logStringMessage("*** SCAbDelete");
     if (gSelectedDir) {
         if (isGroupdavDirectory(gSelectedDir)) {
             let types = GetSelectedCardTypes();
@@ -551,6 +563,7 @@ function SCAbDeleteDirectory(aURI) {
     dump("SCAbDeleteDirectory: aURI: " + aURI + "\n");
     dump("  backtrace:\n" + backtrace() + "\n\n");
 
+		//Services.console.logStringMessage("*** SCAbDeleteDirectory");
     if (isGroupdavDirectory(aURI)) {
         // || isCardDavDirectory(selectedDir)) {
         // 			dump("pouet\n");
@@ -595,7 +608,7 @@ function _SCDeleteListAsDirectory(directory, selectedDir) {
 
 function SCAbConfirmDeleteDirectory(selectedDir) {
     let confirmDeleteMessage;
-    
+
     let prefBranch = (Components.classes["@mozilla.org/preferences-service;1"]
           .getService(Components.interfaces.nsIPrefBranch));
 
@@ -844,19 +857,19 @@ function SCOnCategoriesContextMenuItemCommand(event) {
                 }
             }
             if (changed) {
-              
+
                 requireSync = true;
-                
+
                 card.setProperty("Categories", cats);
-                
+
                 let oldDavVersion=card.getProperty("groupDavVersion", "-1");
                 card.setProperty("groupDavVersion", "-1");
                 card.setProperty("groupDavVersionPrev", oldDavVersion);
-                
+
                 let abManager = Components.classes["@mozilla.org/abmanager;1"]
                                           .getService(Components.interfaces.nsIAbManager);
                 let ab = abManager.getDirectory(abUri);
-                
+
                 ab.modifyCard(card);
             }
         }
@@ -869,9 +882,9 @@ function SCOnCategoriesContextMenuItemCommand(event) {
 }
 
 function SCSetSearchCriteria(menuitem) {
-  
+
     let criteria = menuitem.getAttribute("sc-search-criteria");
-    
+
     if (criteria.length > 0) {
         gQueryURIFormat = "(or(" + criteria + ",c,@V))"; // the "or" is important here
     }
@@ -882,13 +895,13 @@ function SCSetSearchCriteria(menuitem) {
         // ABQueryUtils.jsm - remove leading "?" to migrate existing customized values for mail.addr_book.quicksearchquery.format
         if (nameOrEMailSearch.startsWith("?"))
           nameOrEMailSearch=nameOrEMailSearch.slice(1);
-          
+
         gQueryURIFormat = nameOrEMailSearch;
     }
-    
+
     gSearchInput.setAttribute("placeholder", menuitem.getAttribute("label"));
     gSearchInput.focus();
-    
+
     onEnterInSearchBar();
 }
 
