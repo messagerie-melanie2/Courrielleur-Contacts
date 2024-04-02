@@ -415,8 +415,7 @@ function cm2SynchroListe(newList, oldList){
   if (this.newList){
 
     this.attrs=new GroupDAVListAttributes(newList.URI);
-
-    let parentURI=GetParentDirectoryFromMailingListURI(newList.URI);
+    let parentURI=GetParentDirFromMailingListURI(newList.URI);
     this.abook=MailServices.ab.getDirectory(parentURI);
   }
 
@@ -426,6 +425,25 @@ function cm2SynchroListe(newList, oldList){
                                             this.abook.dirPrefId+".url");
     cm2DavTrace("Synchronisation d'une liste - url serveur du carnet:"+this.srvurl);
   }
+}
+
+// copie de GetParentDirectoryFromMailingListURI pour éviter erreur :
+// ReferenceError: GetParentDirectoryFromMailingListURI is not defined (même avec abCommon.js inclus!)
+// returns null if abURI is not a mailing list URI
+function GetParentDirFromMailingListURI(abURI)
+{
+  var abURIArr = abURI.split("/");
+  /*
+   turn turn "moz-abmdbdirectory://abook.mab/MailList6"
+   into ["moz-abmdbdirectory:","","abook.mab","MailList6"]
+   then, turn ["moz-abmdbdirectory:","","abook.mab","MailList6"]
+   into "moz-abmdbdirectory://abook.mab"
+  */
+  if (abURIArr.length == 4 && abURIArr[0] == "moz-abmdbdirectory:" && abURIArr[3] != "") {
+    return abURIArr[0] + "/" + abURIArr[1] + "/" + abURIArr[2];
+  }
+
+  return null;
 }
 
 cm2SynchroListe.prototype={
@@ -642,8 +660,7 @@ cm2SynchroListe.prototype={
       if (response && 11<response.length){
         //begin:vlist
         let str=response.substr(0, 11);
-        if ("begin:vlist"==str.toLowerCase())
-          return true;
+        return "begin:vcard"==str.toLowerCase();
       }
       return false;
     }
@@ -730,13 +747,17 @@ cm2SynchroListe.prototype={
 
 
     /* membres */
-    let adrSrv=[];
+    let adrSrv=[];		
     for (let i=0;i<serveur.length;i++) {
       let line=serveur[i];
-      if ("card"==line.tag) {
-        let email = line.parameters["email"][0];
-        if (email) {
-          email=email.replace(/[\r\n\s]*/g, "");
+			//dump("mergeModifications serveur line.tag:'"+line.tag+"'\n");
+      if ("member"==line.tag && 0==line.values[0].indexOf("urn:uuid:")) {
+				let uidMembre=line.values[0].replace("urn:uuid:", "");
+				//dump("mergeModifications uidMembre adrSrv:'"+uidMembre+"'\n");				
+				let card=this._findCardWithUID(uidMembre);
+        if (card && card.primaryEmail) {
+          let email=card.primaryEmail.replace(/[\r\n\s]*/g, "");
+					dump("mergeModifications email adrSrv:'"+email+"'\n");
           adrSrv.push(email);
         }
       }
@@ -756,11 +777,11 @@ cm2SynchroListe.prototype={
         // ajout
         let card=this._findCardWithEmail(email);
         if (card){
-          dump("  mergeModifications ajout membre email:"+email+"\n");
+          dump("  mergeModifications ajout membre email:'"+email+"'\n");
           modifie.addressLists.appendElement(card, false);
           bmodif=true;
         } else{
-          dump("!!! mergeModifications ajout membre email:"+email+"  non trouve\n");
+          dump("!!! mergeModifications ajout membre email:'"+email+"'  non trouve\n");
         }
       }
     }
@@ -769,6 +790,7 @@ cm2SynchroListe.prototype={
     nb=adrModif.length;
     for (let i=0;i<nb;i++){
       let email=adrModif[i];
+			dump(" mergeModifications email adrModif:'"+email+"'\n");
       if (!adrOld.includes(email))
         continue;
       if (!adrSrv.includes(email)){
@@ -782,7 +804,7 @@ cm2SynchroListe.prototype={
           if (null==email2 && ""==email2)
             continue;
           if (email==email2){
-            dump(" mergeModifications suppression membre email:"+email+"\n");
+            dump(" mergeModifications suppression membre\n");
             modifie.addressLists.removeElementAt(index);
             nbCards=modifie.addressLists.length;
             bmodif=true;
@@ -809,7 +831,7 @@ cm2SynchroListe.prototype={
       let email=card.primaryEmail;
       if (null==email && ""==email)
         continue;
-      dump("  _getEmailMembres email:"+email+"\n");
+      dump("  _getEmailMembres email:'"+email+"'\n");
       adrs.push(email);
     }
 
@@ -823,6 +845,19 @@ cm2SynchroListe.prototype={
     while (cards.hasMoreElements()) {
       let card=cards.getNext().QueryInterface(Components.interfaces.nsIAbCard);
       if (card.primaryEmail==email)
+        return card;
+    }
+
+    return null;
+  },
+	
+	// recherche d'un contact à partir de son identifiant
+	_findCardWithUID:function(uid){
+
+    let cards=this.abook.childCards;
+    while (cards.hasMoreElements()) {
+      let card=cards.getNext().QueryInterface(Components.interfaces.nsIAbCard);
+      if (card.getProperty("CardUID", "")==uid)
         return card;
     }
 
