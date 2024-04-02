@@ -11,7 +11,7 @@ pref("courrielleur.contactsdav.traces", false);
 
 // 0004438: Mise à jour des adresses collectées
 // service actif
-pref("courrielleur.majadrcol", true);
+pref("courrielleur.majadrcol", false);
 // detecter tous les n jours
 pref("courrielleur.majadrcol.njours", 3);
 // messages debug
