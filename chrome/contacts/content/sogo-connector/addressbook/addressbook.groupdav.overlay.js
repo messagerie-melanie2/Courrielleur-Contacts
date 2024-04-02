@@ -182,10 +182,10 @@ abDirTreeObserver.SCOnDrop = function(row, or) {
         let targetResource = gDirectoryTreeView.getDirectoryAtIndex(row);
         let targetURI = targetResource.URI;
 
-        // dump("source dir: " + sourceDirectory + "\n");
-        // dump("  source uri: " + sourceDirectory.URI + "\n");
-        // dump("  target dir: " + targetURI + "\n");
-        // dump("  targetReource: " + targetResource + "\n");
+				//dump("source dir: " + sourceDirectory + "\n");
+				//dump("  source uri: " + sourceDirectory.URI + "\n");
+				//dump("  target dir: " + targetURI + "\n");
+				//dump("  targetReource: " + targetResource + "\n");
         let cardKeys = null;
         if (targetURI.indexOf(sourceDirectory.URI) != 0
             && isGroupdavDirectory(sourceDirectory.URI)) {
@@ -198,6 +198,7 @@ abDirTreeObserver.SCOnDrop = function(row, or) {
 
         let proceed = true;
         try {
+					//dump("SCOnDrop => SCOnDropOld \n");
             this.SCOnDropOld(row, or);
         }
         catch(e) {
@@ -215,6 +216,7 @@ abDirTreeObserver.SCOnDrop = function(row, or) {
             }
         }
         else if (isGroupdavDirectory(targetURI)) {
+					//dump("isGroupdavDirectory SynchronizeGroupdavAddressbook targetURI:"+targetURI+"\n");
             SynchronizeGroupdavAddressbook(targetURI);
         }
 
@@ -238,10 +240,12 @@ abDirTreeObserver._getDroppedCardsKeysFromSession = function(dragSession, abView
 
     let trans = Components.classes["@mozilla.org/widget/transferable;1"]
                           .createInstance(Components.interfaces.nsITransferable);
+		trans.init(null);
     trans.addDataFlavor("moz/abcard");
+		trans.addDataFlavor("text/vcard");
 
     for (let i = 0; i < dragSession.numDropItems; i++) {
-        dragSession.getData(trans, i);
+        dragSession.getData(trans, i);	
         let dataObj = {};
         let bestFlavor = {};
         let len = {};
@@ -272,6 +276,7 @@ abDirTreeObserver._resetDroppedCardsVersionFromSession = function(dragSession, a
     let trans = Components.classes["@mozilla.org/widget/transferable;1"]
                           .createInstance(Components.interfaces.nsITransferable);
     trans.addDataFlavor("moz/abcard");
+		trans.addDataFlavor("text/vcard");
 
     for (let i = 0; i < dragSession.numDropItems; i++) {
         dragSession.getData(trans, i);

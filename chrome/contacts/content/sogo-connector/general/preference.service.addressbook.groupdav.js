@@ -37,7 +37,7 @@ jsInclude(["chrome://sogo-connector/content/general/mozilla.utils.inverse.ca.js"
 function isGroupdavDirectory(abURI) {
   
   let value = false;
-  
+  //dump("*** preference.service.addressbook.groupdav.js isGroupdavDirectory :"+abURI+"\n");
   if (!abURI
       || -1!=abURI.search("mab/MailList")
       || "moz-abmdbdirectory://abook.mab"==abURI  //kPersonalAddressbookUri
@@ -52,6 +52,7 @@ function isGroupdavDirectory(abURI) {
   
   //  		let prefId = ab.directoryProperties.prefName;
   let prefId = ab.dirPrefId;
+	//dump("*** preference.service.addressbook.groupdav.js prefId :"+prefId+"\n");
   try {
     let groupdavPrefService = new GroupdavPreferenceService(prefId);
     value = (groupdavPrefService.getURL() != "");
@@ -129,7 +130,7 @@ GroupdavPreferenceService.prototype = {
         // 		dump("getPref: " + this.prefPath + prefName + "\n");
 
         try {
-            value = this.mPreferencesService.getCharPref(this.prefPath + prefName);
+            value = this.mPreferencesService.getCharPref(this.prefPath + prefName, "");
         }
         catch(e) {
             dump("exception getting pref '" + this.prefPath + prefName
