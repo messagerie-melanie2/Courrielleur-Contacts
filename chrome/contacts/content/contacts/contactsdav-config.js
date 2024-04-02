@@ -65,9 +65,9 @@ function cm2davConfigureCarnets(fncfin) {
 
   //lister les carnets du courrielleur
   let carnetsCm2=cm2davListeCarnetsCm2();
-  
+
   //migration des noms
-  cm2davMigreNouvNoms(carnetsCm2);  
+  cm2davMigreNouvNoms(carnetsCm2);
 
   //fonction de rappel pour cm2davListeCarnetsSrv
   function retourListeDav(status, carnetsDav) {
@@ -80,7 +80,7 @@ function cm2davConfigureCarnets(fncfin) {
 
     //supprimer les carnets cm2 qui ne sont plus sur le serveur
     for (let carnet of carnetsCm2) {
-      
+
       let preserve=cm2davSearchCarnetInListe(carnet, carnetsDav);
       if (preserve) {
         continue;
@@ -93,7 +93,7 @@ function cm2davConfigureCarnets(fncfin) {
 
     //ajouter ou modifier les carnets d'adresses
     for (let carnet of carnetsDav) {
-      
+
       cm2DavTrace("cm2davConfigureCarnets - traitement du carnet url:"+carnet["url"]);
       let existe=cm2davCarnetExiste(carnet);
       let resultat=false;
@@ -101,44 +101,44 @@ function cm2davConfigureCarnets(fncfin) {
       if (existe) {
         //supprimer les carnets qui ne sont pas affiches (choix utilisateur)
         if (Services.prefs.prefHasUserValue(CM2DAV_PREFIXE_CARNETS+carnet["prefid"]+".affichage")){
-          let aff=Services.prefs.getBoolPref(CM2DAV_PREFIXE_CARNETS+carnet["prefid"]+".affichage");       
+          let aff=Services.prefs.getBoolPref(CM2DAV_PREFIXE_CARNETS+carnet["prefid"]+".affichage");
           if (!aff){
             cm2DavEcritLog(CM2DAV_LOGS_CFG, "Suppression d'un carnet non affiche prefid", carnet["prefid"]);
             cm2davSupprimeCarnet(carnet["prefid"]);
             continue;
           }
         }
-        
+
         op="Mise a jour du carnet : '";
         cm2DavEcritLog(CM2DAV_LOGS_CFG, "Mise a jour d'un carnet", carnet["url"]);
         resultat=cm2davMajCarnet(carnet);
-        
+
       } else {
         //ne pas ajouter les carnets qui ne sont pas affiches (choix utilisateur)
         if (Services.prefs.prefHasUserValue(CM2DAV_PREFIXE_CARNETS+carnet["prefid"]+".affichage")){
-          let aff=Services.prefs.getBoolPref(CM2DAV_PREFIXE_CARNETS+carnet["prefid"]+".affichage");       
+          let aff=Services.prefs.getBoolPref(CM2DAV_PREFIXE_CARNETS+carnet["prefid"]+".affichage");
           if (!aff){
             cm2DavTrace("cm2davConfigureCarnets carnet non affiche => pas d'ajout");
             continue;
           }
         }
-        
+
         op="Ajout du carnet : '";
         cm2DavEcritLog(CM2DAV_LOGS_CFG, "Ajout d'un carnet", carnet["url"]);
         resultat=cm2davAjoutCarnet(carnet);
       }
-      
+
       let msg=op+carnet["url"]+(resultat?"' => succes":" => echec");
       cm2DavEcritLog(CM2DAV_LOGS_CFG, msg);
       cm2DavTrace("cm2davConfigureCarnets "+msg);
     }
-    
+
     //v3.0 - Bug mantis 0004251: Les carnets supprimés sur le serveur sont toujours listés dans la boîte d'affichage
     // mettre a jour carnet supprimes
     cm2davMajListeCarnetAff(carnetsDav);
-    
+
     // mantis 0004780: Abandon du carnet "Adresses personnelles" pour les nouveaux profils
-    let val=Services.prefs.getCharPref("courrielleur.contactsdav.defaut");  
+    let val=Services.prefs.getCharPref("courrielleur.contactsdav.defaut");
     if (""==val){
       let prefid=cm2davDirName(uid);
       if (Services.prefs.prefHasUserValue("ldap_2.servers."+prefid+".filename")){
@@ -207,7 +207,7 @@ function cm2davCarnetExiste(infos) {
 * Retourne identifiant réduit (partie gauche de .-.)
 */
 function cm2davUidReduit(uid) {
-  
+
   let pos=uid.indexOf(".-.");
   if (-1!=pos)
     return uid.substr(0,pos);
@@ -226,7 +226,7 @@ function cm2davListeUids() {
   let uids=new Array();
 
   if (Services.prefs.prefHasUserValue("pacome.ignoreuids")){
-    
+
     let ignoreuids=Services.prefs.getCharPref("pacome.ignoreuids");
     cm2DavTrace("cm2davListeUids ignoreuids:"+ignoreuids);
 
@@ -235,18 +235,18 @@ function cm2davListeUids() {
       ignoreuids=ignoreuids.split(";");
 
       for (let i=0;i<ignoreuids.length;i++){
-        
-        if (null==ignoreuids[i] || 0==ignoreuids[i].length) 
+
+        if (null==ignoreuids[i] || 0==ignoreuids[i].length)
           continue;
-        
+
         cm2DavTrace("cm2davListeUids  traitement ignoreuids:"+ignoreuids[i]);
         let ident=cm2davUidReduit(ignoreuids[i]);
         cm2DavTrace("cm2davListeUids uid reduit:"+ident);
-        
+
         //ajout?
         let u=0;
         for (;u<uids.length;u++){
-          if (ident==uids[u]) 
+          if (ident==uids[u])
             break;
         }
         if (u==uids.length){
@@ -259,30 +259,30 @@ function cm2davListeUids() {
 
   //parcours des comptes
   let nb=MailServices.accounts.accounts.length;
-  
+
   for (let c=0;c<nb;c++){
-    
+
     let compte=MailServices.accounts.accounts.QueryElementAt(c,Components.interfaces.nsIMsgAccount);
-    if ((null==compte)||(null==compte.incomingServer)) 
+    if ((null==compte)||(null==compte.incomingServer))
       continue;
-    
+
     //test boite pacome
-    if ("imap"!=compte.incomingServer.type && "pop3"!=compte.incomingServer.type) 
+    if ("imap"!=compte.incomingServer.type && "pop3"!=compte.incomingServer.type)
       continue;
     let confid=compte.incomingServer.getCharValue("pacome.confid");
-    if (null==confid) 
+    if (null==confid)
       continue;
-    
+
     //uid
     let uid=cm2davUidReduit(compte.incomingServer.username);
-    
+
     //ajout
     let i=0;
     for (;i<uids.length;i++){
-      if (uid==uids[i]) 
+      if (uid==uids[i])
         break;
     }
-    
+
     if (i==uids.length){
       cm2DavTrace("cm2davListeUids uid de boite:"+uid);
       uids.push(uid);
@@ -297,7 +297,7 @@ function cm2davUidPrincipal() {
   cm2DavTrace("cm2davUidPrincipal");
 
   let uid=PacomeAuthUtils.GetUidComptePrincipal();
-  
+
   return uid;
 }
 
@@ -337,7 +337,7 @@ function cm2davListeCarnetsCm2() {
     if (0<pos) {
       let prefid=val.substr(0, pos);
       cm2DavTrace("cm2davListeCarnetsCm2 identifiant prefid:"+prefid);
-      
+
       idents.push(prefid);
     }
   }
@@ -353,14 +353,14 @@ function cm2davListeCarnetsCm2() {
       carnet["libelle"]=prefBranch.getStringPref(CM2DAV_PREFIXE_CARNETS+prefid+".libelle");
     if (prefBranch.prefHasUserValue(CM2DAV_PREFIXE_CARNETS+prefid+".affichage"))
       carnet["affichage"]=prefBranch.getBoolPref(CM2DAV_PREFIXE_CARNETS+prefid+".affichage");
-    
+
     if (prefBranch.prefHasUserValue(CM2DAV_PREF_SOGO+CM2DAV_PREF_LDAP2+prefid+".url"))
       carnet["url"]=prefBranch.getCharPref(CM2DAV_PREF_SOGO+CM2DAV_PREF_LDAP2+prefid+".url");
     if (prefBranch.prefHasUserValue(CM2DAV_PREF_SOGO+CM2DAV_PREF_LDAP2+prefid+".getctag"))
       carnet["getctag"]=prefBranch.getCharPref(CM2DAV_PREF_SOGO+CM2DAV_PREF_LDAP2+prefid+".getctag");
     if (prefBranch.prefHasUserValue(CM2DAV_PREF_LDAP2+prefid+".description"))
       carnet["displayname"]=prefBranch.getCharPref(CM2DAV_PREF_LDAP2+prefid+".description");
-    
+
     carnets.push(carnet);
   }
 
@@ -386,7 +386,7 @@ function cm2davListeCarnetsCm2() {
 *       "getctag" : ctag du carnet
 */
 function cm2davListeCarnetsSrv(uid, fnc) {
-  
+
   cm2DavTrace("cm2davListeCarnetsSrv uid:"+uid);
 
   let carnets=new Array();
@@ -396,7 +396,7 @@ function cm2davListeCarnetsSrv(uid, fnc) {
 
   let traces=cm2DavTrace;
   let target={
-    
+
     onDAVQueryComplete: function(status, response, headers, cbData) {
       traces("cm2davListeCarnetsSrv onDAVQueryComplete status:"+status);
       cm2DavEcritLog(CM2DAV_LOGS_CFG, "Reponse du serveur - status:", status);
@@ -425,14 +425,21 @@ function cm2davListeCarnetsSrv(uid, fnc) {
                       displayname=prop["displayname"][0];
                       traces("cm2davListeCarnetsSrv onDAVQueryComplete displayname:"+displayname);
                     }
-                    if (prop["readonly"]) {
-                      readonly=prop["readonly"][0];
+/*
+                    if (prop["read-only"]) {
+                      readonly=prop["read-only"][0];
                       traces("cm2davListeCarnetsSrv onDAVQueryComplete readonly:"+readonly);
-                    }
+                    }*/
                     if (prop["getctag"]) {//a priori pas necessaire
                       getctag=prop["getctag"][0];
                       traces("cm2davListeCarnetsSrv onDAVQueryComplete getctag:"+getctag);
                     }
+
+                    if (prop["current-user-privilege-set"]){
+                      let privset=prop["current-user-privilege-set"][0];
+                      readonly=CarnetReadOnly(privset);
+                    }
+                    traces("cm2davListeCarnetsSrv onDAVQueryComplete readonly:"+readonly);
 
                     //construire informations du carnet d'adresses
                     let carnet=cm2davGetInfosFromHref(href);
@@ -467,8 +474,30 @@ function cm2davListeCarnetsSrv(uid, fnc) {
   let req=new sogoWebDAV(userurl, target, data);
 
   req.propfind(["DAV: resourcetype", "DAV: displayname",
+                "DAV: current-user-privilege-set",
                 "http://sabredav.org/ns/ read-only",
                 "http://calendarserver.org/ns/ getctag"], true);
+}
+
+// retourn "true" si carnet en lecture seule
+// test présence de current-user-privilege-set/privilege/write
+function CarnetReadOnly(prop){
+
+  for (let m in prop) {
+    if (m=="privilege"){
+      //cm2DavTrace("m:"+m);
+      for (let p in prop["privilege"]){
+        //cm2DavTrace("p:"+p);
+        for (let d in prop["privilege"][p]){
+          //cm2DavTrace("d:"+d);
+          if (d=="write")
+            return "false";
+        }
+      }
+    }
+  }
+
+  return "true";
 }
 
 
@@ -499,9 +528,9 @@ function cm2davGetInfosFromHref(href) {
   let srv=cm2davGetCm2DavSrvName();
   let url=CM2DAV_PROTO+srv+href;
   infos["url"]=url;
-	let pos=compos.length-1;
-	if (compos[pos]=="")
-		pos--;
+  let pos=compos.length-1;
+  if (compos[pos]=="")
+    pos--;
   //uid
   infos["uid"]=compos[pos-1];
   //bookid
@@ -521,7 +550,7 @@ function cm2davGetCm2DavSrvName() {
 
   if (null!=gCm2davSrvName)
     return gCm2davSrvName;
-  
+
   //CM2DAV_PREF_SERVER_NAME
 
   gCm2davSrvName=Services.prefs.getCharPref(CM2DAV_PREF_SERVER_NAME);
@@ -558,7 +587,7 @@ function cm2davDirName(str) {
 * return true si succes
 */
 function cm2davSupprimeCarnet(prefid) {
-  
+
   cm2DavTrace("cm2davSupprimeCarnet prefid:"+prefid);
 
   let prefdir=CM2DAV_PREF_LDAP2+prefid;
@@ -582,7 +611,7 @@ function cm2davSupprimeCarnet(prefid) {
     cm2DavTrace("cm2davSupprimeCarnet carnet inexistant");
     return false;
   }
-  
+
   //mantis 0003333:ne pas supprimer les preferences courrielleur => marquer affichage a false
   //memoriser libelle
   //courrielleur
@@ -595,7 +624,7 @@ function cm2davSupprimeCarnet(prefid) {
 
   //Sogo
   Services.prefs.deleteBranch(CM2DAV_PREF_SOGO+CM2DAV_PREF_LDAP2+prefid);
-  
+
   // supprimer les preferences sogo des listes
   let prefs=Services.prefs.getBranch(CM2DAV_PREF_SOGO);
   let prefNames=prefs.getChildList("", {});
@@ -604,7 +633,7 @@ function cm2davSupprimeCarnet(prefid) {
       Services.prefs.clearUserPref(CM2DAV_PREF_SOGO+m);
     }
   }
-  
+
   Services.prefs.savePrefFile(null);
 
   return true;
@@ -638,11 +667,11 @@ function cm2davAjoutCarnet(infos) {
   let prefBranch=Services.prefs.getBranch(null);
   prefBranch.setCharPref(CM2DAV_PREFIXE_CARNETS+dirname+".bookid", infos["bookid"]);
   prefBranch.setCharPref(CM2DAV_PREFIXE_CARNETS+dirname+".uid", infos["uid"]);
-  
+
   //mantis 0003333
   prefBranch.setStringPref(CM2DAV_PREFIXE_CARNETS+dirname+".libelle", infos["displayname"]);
   prefBranch.setBoolPref(CM2DAV_PREFIXE_CARNETS+dirname+".affichage", true);
-  
+
   //lecture seule?
   if ("true"==infos["readonly"]) {
     cm2DavTrace("cm2davAjoutCarnet carnet en lecture seule");
@@ -703,7 +732,7 @@ function cm2davMajCarnet(infos) {
   //mantis 0003333
   prefBranch.setStringPref(CM2DAV_PREFIXE_CARNETS+dirname+".libelle", infos["displayname"]);
   if (!prefBranch.prefHasUserValue(CM2DAV_PREFIXE_CARNETS+dirname+".affichage"))
-    prefBranch.setBoolPref(CM2DAV_PREFIXE_CARNETS+dirname+".affichage", true); 
+    prefBranch.setBoolPref(CM2DAV_PREFIXE_CARNETS+dirname+".affichage", true);
 
   //lecture seule?
   if ("true"==infos["readonly"]) {
@@ -739,17 +768,17 @@ function cm2davMigreNouvNoms(carnetsCm2) {
 // mettre a jour carnet supprimes
 //carnetsDav : tableau des carnets serveur
 function cm2davMajListeCarnetAff(carnetsDav){
-  
+
   let prefBranch=Services.prefs.getBranch(CM2DAV_PREFIXE_CARNETS);
-  
+
   //listage identifiants memorises
   let nb={};
   let prefs=prefBranch.getChildList("", nb);
   for (var i=0; i<prefs.length; i++){
-    
+
     let val=prefs[i].split(".");
     let prefid=val[0];
-    
+
     if ("bookid"==val[1]){
       cm2DavTrace("cm2davMajListeCarnetAff prefid:"+prefid);
       let present=false;
