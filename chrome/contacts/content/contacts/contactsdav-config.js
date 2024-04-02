@@ -467,7 +467,7 @@ function cm2davListeCarnetsSrv(uid, fnc) {
   let req=new sogoWebDAV(userurl, target, data);
 
   req.propfind(["DAV: resourcetype", "DAV: displayname",
-                "http://courrielleur.melanie2.i2/ns/ readonly",
+                "http://sabredav.org/ns/ read-only",
                 "http://calendarserver.org/ns/ getctag"], true);
 }
 
