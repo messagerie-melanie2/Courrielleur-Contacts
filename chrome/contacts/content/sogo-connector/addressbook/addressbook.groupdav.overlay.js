@@ -999,18 +999,20 @@ function RechargeCarnet(){
     //masquer le carnet selectionne
     let dir=MailServices.ab.getDirectory(gSelectedDir);
     const prefix="ldap_2.servers.";
-    let dirId=dir.dirPrefId.substr(prefix.length);
+    let prefid=dir.dirPrefId.substr(prefix.length);
+    Services.console.logStringMessage("RechargeCarnet prefid:"+prefid);
 
-    Services.prefs.setBoolPref(CM2DAV_PREFIXE_CARNETS+dirId+".affichage", false);
-    Services.prefs.setBoolPref(CM2DAV_PREFIXE_CARNETS+dirId+".affichage", true);
+    // informations du carnet
+    let carnet=InfosCarnet(prefid);
 
-    //mise a jour configuration
-    let mailWindow=Services.wm.getMostRecentWindow("mail:3pane");
+    // supprimer le carnet
+    cm2davSupprimeCarnet(prefid);
 
-    if (mailWindow && mailWindow.cm2davConfigureCarnets){
-      mailWindow.cm2davStopTimerRefresh();
-      mailWindow.cm2davStartTimerRefresh(100);
-    }
+    // ajouter le carnet
+    cm2davAjoutCarnet(carnet);
+
+    // synchroniser
+    SCCommandSynchronize();
   }
 }
 

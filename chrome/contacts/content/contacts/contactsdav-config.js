@@ -343,30 +343,37 @@ function cm2davListeCarnetsCm2() {
   }
 
   //informations des carnets
-  prefBranch=Services.prefs.getBranch(null);
   for (let prefid of idents) {
-    let carnet=new Array();
-    carnet["prefid"]=prefid;
-    carnet["bookid"]=prefBranch.getCharPref(CM2DAV_PREFIXE_CARNETS+prefid+".bookid");
-    carnet["uid"]=prefBranch.getCharPref(CM2DAV_PREFIXE_CARNETS+prefid+".uid");
-    if (prefBranch.prefHasUserValue(CM2DAV_PREFIXE_CARNETS+prefid+".libelle"))
-      carnet["libelle"]=prefBranch.getStringPref(CM2DAV_PREFIXE_CARNETS+prefid+".libelle");
-    if (prefBranch.prefHasUserValue(CM2DAV_PREFIXE_CARNETS+prefid+".affichage"))
-      carnet["affichage"]=prefBranch.getBoolPref(CM2DAV_PREFIXE_CARNETS+prefid+".affichage");
-
-    if (prefBranch.prefHasUserValue(CM2DAV_PREF_SOGO+CM2DAV_PREF_LDAP2+prefid+".url"))
-      carnet["url"]=prefBranch.getCharPref(CM2DAV_PREF_SOGO+CM2DAV_PREF_LDAP2+prefid+".url");
-    if (prefBranch.prefHasUserValue(CM2DAV_PREF_SOGO+CM2DAV_PREF_LDAP2+prefid+".getctag"))
-      carnet["getctag"]=prefBranch.getCharPref(CM2DAV_PREF_SOGO+CM2DAV_PREF_LDAP2+prefid+".getctag");
-    if (prefBranch.prefHasUserValue(CM2DAV_PREF_LDAP2+prefid+".description"))
-      carnet["displayname"]=prefBranch.getCharPref(CM2DAV_PREF_LDAP2+prefid+".description");
-
+    let carnet=InfosCarnet(prefid);
     carnets.push(carnet);
   }
 
   return carnets;
 }
 
+// construit la configuration d'un carnet ()
+function InfosCarnet(prefid){
+
+  let carnet=new Array();
+  let prefBranch=Services.prefs.getBranch(null);
+
+  carnet["prefid"]=prefid;
+  carnet["bookid"]=prefBranch.getCharPref(CM2DAV_PREFIXE_CARNETS+prefid+".bookid");
+  carnet["uid"]=prefBranch.getCharPref(CM2DAV_PREFIXE_CARNETS+prefid+".uid");
+  if (prefBranch.prefHasUserValue(CM2DAV_PREFIXE_CARNETS+prefid+".libelle"))
+    carnet["libelle"]=prefBranch.getStringPref(CM2DAV_PREFIXE_CARNETS+prefid+".libelle");
+  if (prefBranch.prefHasUserValue(CM2DAV_PREFIXE_CARNETS+prefid+".affichage"))
+    carnet["affichage"]=prefBranch.getBoolPref(CM2DAV_PREFIXE_CARNETS+prefid+".affichage");
+
+  if (prefBranch.prefHasUserValue(CM2DAV_PREF_SOGO+CM2DAV_PREF_LDAP2+prefid+".url"))
+    carnet["url"]=prefBranch.getCharPref(CM2DAV_PREF_SOGO+CM2DAV_PREF_LDAP2+prefid+".url");
+  if (prefBranch.prefHasUserValue(CM2DAV_PREF_SOGO+CM2DAV_PREF_LDAP2+prefid+".getctag"))
+    carnet["getctag"]=prefBranch.getCharPref(CM2DAV_PREF_SOGO+CM2DAV_PREF_LDAP2+prefid+".getctag");
+  if (prefBranch.prefHasUserValue(CM2DAV_PREF_LDAP2+prefid+".description"))
+    carnet["displayname"]=prefBranch.getCharPref(CM2DAV_PREF_LDAP2+prefid+".description");
+
+  return carnet;
+}
 
 /**
 * Obtenir la liste des carnets depuis le serveur pour un identifiant
