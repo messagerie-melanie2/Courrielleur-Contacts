@@ -56,11 +56,13 @@
   <commandset id="addressBook">
     <command id="cmd_syncGroupdav" oncommand="SCCommandSynchronize();"/>
     <command id="cmd_syncAbortGroupdav" oncommand="SCCommandSynchronizeAbort();"/>
+    <command id="cmd_reloadGroupdav" oncommand="RechargeCarnet();"/>
   </commandset>
 
   <!--Add the GroupDAV synchronize button to the toolbar -->
   <toolbarpalette id="AddressBookToolbarPalette">
     <toolbarbutton id="button-groupdavSync" label="&GroupDavSync.label;" tooltiptext="&GroupDavSync.tooltip;" class="toolbarbutton-1" command="cmd_syncGroupdav"/>
+    <toolbarbutton id="button-groupdavReload" label="&GroupDavReload.label;" tooltiptext="&GroupDavReload.tooltip;" class="toolbarbutton-1" command="cmd_reloadGroupdav"/>
   </toolbarpalette>
 
   <toolbaritem id="search-container">
@@ -90,6 +92,7 @@
     <menuseparator/>	
     <menuitem id="dirTreeContext-syncGroupdav" label="&GroupDavSync.label;" accesskey="&GroupDavSync.accesskey;" command="cmd_syncGroupdav"/>
     <menuitem id="dirTreeContext-syncGroupdavAbort" label="&GroupDavSyncAbort.label;" hidden="true" accesskey="&GroupDavSyncAbort.accesskey;" command="cmd_syncAbortGroupdav"/>
+    <menuitem id="dirTreeContext-reloadGroupdav" label="&GroupDavReload.label;" accesskey="&GroupDavReload.accesskey;" command="cmd_reloadGroupdav"/>
   </popup>
   
   <!-- Add the New GroupDAV addressbook menu to the File menu	 -->

@@ -88,6 +88,7 @@ function SCGoUpdateGlobalEditMenuItems() {
         gSelectedDir = GetSelectedDirectory();
         //  		dump("SCGoUpdateGlobalEditMenuItems\n  gSelectedDir" + gSelectedDir + "\n");
         goUpdateCommand("cmd_syncGroupdav");
+        goUpdateCommand("cmd_reloadGroupdav");
         goUpdateCommand("cmd_syncAbortGroupdav");
         this.SCGoUpdateGlobalEditMenuItemsOld();
     }
@@ -101,6 +102,7 @@ function SCCommandUpdate_AddressBook() {
         gSelectedDir = GetSelectedDirectory();
         //  		dump("SCCommandUpdate_AddressBook  gSelectedDir" + gSelectedDir + "\n");
         goUpdateCommand('cmd_syncGroupdav');
+        goUpdateCommand('cmd_reloadGroupdav');
         goUpdateCommand("cmd_syncAbortGroupdav");
         this.SCCommandUpdate_AddressBookOld();
     }
@@ -114,6 +116,7 @@ function SCGoUpdateSelectEditMenuItems() {
         gSelectedDir = GetSelectedDirectory();
         //  		dump("SCGoUpdateSelectEditMenuItems  gSelectedDir" + gSelectedDir + "\n");
         goUpdateCommand('cmd_syncGroupdav');
+        goUpdateCommand('cmd_reloadGroupdav');
         goUpdateCommand("cmd_syncAbortGroupdav");
         this.SCGoUpdateSelectEditMenuItemsOld();
     }
@@ -128,7 +131,7 @@ function dirPaneControllerOverlay() {
 
 dirPaneControllerOverlay.prototype = {
     supportsCommand: function(command) {
-        return (command == "cmd_syncGroupdav" || command == "cmd_syncAbortGroupdav");
+        return (command == "cmd_syncGroupdav" || command == "cmd_syncAbortGroupdav" || command == "cmd_reloadGroupdav");
     },
 
     isCommandEnabled: function(command) {
@@ -145,6 +148,7 @@ dirPaneControllerOverlay.prototype = {
             try {
                 switch (command) {
                 case "cmd_syncGroupdav":
+                case "cmd_reloadGroupdav":
                     result = isGroupdavDirectory(gSelectedDir);
                     break;
                 case "cmd_syncAbortGroupdav":
@@ -982,6 +986,32 @@ function cm2SynchroContactFromChildWindow(newCard, oldCard){
 function cm2SynchroListeFromChildWindow(newList, oldList){
 
   this.setTimeout(cm2SynchroniseListe, 100, newList, oldList);
+}
+
+
+/*
+* Rechargement d'un Carnet
+*/
+function RechargeCarnet(){
+
+  if (gSelectedDir && ""!=gSelectedDir && isGroupdavDirectory(gSelectedDir)){
+
+    //masquer le carnet selectionne
+    let dir=MailServices.ab.getDirectory(gSelectedDir);
+    const prefix="ldap_2.servers.";
+    let dirId=dir.dirPrefId.substr(prefix.length);
+
+    Services.prefs.setBoolPref(CM2DAV_PREFIXE_CARNETS+dirId+".affichage", false);
+    Services.prefs.setBoolPref(CM2DAV_PREFIXE_CARNETS+dirId+".affichage", true);
+
+    //mise a jour configuration
+    let mailWindow=Services.wm.getMostRecentWindow("mail:3pane");
+
+    if (mailWindow && mailWindow.cm2davConfigureCarnets){
+      mailWindow.cm2davStopTimerRefresh();
+      mailWindow.cm2davStartTimerRefresh(100);
+    }
+  }
 }
 
 

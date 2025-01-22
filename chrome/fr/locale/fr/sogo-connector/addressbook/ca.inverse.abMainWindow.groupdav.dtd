@@ -31,6 +31,10 @@
 <!ENTITY GroupDavSyncAbort.accesskey                  		"A">
 <!ENTITY GroupDavSyncAbort.tooltip                      	"Abort ongoing Synchronization (try if nothing happens)"> 
 
+<!ENTITY GroupDavReload.label                       "Recharger">
+<!ENTITY GroupDavReload.accesskey                   "R">
+<!ENTITY GroupDavReload.tooltip                     "Rechargement du carnte d'adresse">
+
 <!ENTITY GroupDavConf.label                      		"Configurer">
 <!ENTITY GroupDavConf.accesskey                  		"C">
 
