@@ -57,7 +57,7 @@ function OnLoadEditListOverlay() {
   // mantis 4392
   RegisterSaveListener(cm2SaveMailList);
   
-  if ("arguments" in window && window.arguments[0]){
+  if ("arguments" in window && window.arguments[0] && window.arguments[0].listURI){
     var listUri=window.arguments[0].listURI;
     var liste=GetDirectoryFromURI(listUri);
     if (liste){
