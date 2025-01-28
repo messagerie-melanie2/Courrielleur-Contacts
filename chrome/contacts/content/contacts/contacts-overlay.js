@@ -15,7 +15,7 @@ window.addEventListener("load",
         let dirTree=document.getElementById('dirTree');
         dirTree.controllers.appendController(gDirPaneCtrl);
         // mettre a jour etat button_delete
-        window.setTimeout(cm2InitBtDelete, 500);
+        window.setTimeout(cm2InitBtDelete, 500);     
                                  
        }, false);
 
@@ -122,7 +122,10 @@ function affichePopupContacts(){
     let dir=MailServices.ab.getDirectory(seldir);
     if (dir &&
         "ldap_2.servers.history"==dir.dirPrefId){
-      elem.hidden=false;
+
+      // masquer Mettre à jour si service mise à jour des adresses collectées désactivé
+      elem.hidden=!Services.prefs.getBoolPref("courrielleur.majadrcol", false);
+
       if (Services.io.offline)
         elem.disabled=true;
       else
