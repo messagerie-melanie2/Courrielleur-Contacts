@@ -133,7 +133,7 @@ dirPaneControllerOverlay.prototype = {
 
     isCommandEnabled: function(command) {
         let result = false;
-        
+
       let connecte=cm2davTestConnexion();
       if (false==connecte) {
         return result;
@@ -458,6 +458,7 @@ function SCAbConfirmDelete(types) {
         let confirmDeleteMessage;
         let numSelectedItems=gAbView.selection.count;
         let itemName;
+        let selectedDir = getSelectedDirectory();
 
         if (types == kListsAndCards)
             confirmDeleteMessage = gAddressBookBundle.getString("confirmDelete2orMoreContactsAndLists");
@@ -474,18 +475,21 @@ function SCAbConfirmDelete(types) {
                 confirmDeleteMessage = gAddressBookBundle.getString("confirmDelete2orMoreContacts");
         }
         else {
-          confirmDeleteMessage = gAddressBookBundle.getString("confirmDeleteThisMailingList");
-          let theCard=GetSelectedAbCards()[0];
-          itemName=theCard.displayName;
+            //#8681: Suppression d'un liste de contacts
+            confirmDeleteMessage = gAddressBookBundle.getString("confirmDeleteThisMailingList");
+            if (selectedDir.isMailList){
+                itemName=selectedDir.dirName;
+            }
+            else{
+                let theCard=GetSelectedAbCards()[0];
+                itemName=theCard.displayName;
+            }
         }
 
         // parametre
-        if (1==numSelectedItems){
-
-          confirmDeleteMessage=confirmDeleteMessage.replace("#1", itemName);
-
+        if (selectedDir.isMailList || 1==numSelectedItems){
+            confirmDeleteMessage=confirmDeleteMessage.replace("#1", itemName);
         } else{
-
           confirmDeleteMessage=PluralForm.get(numSelectedItems, confirmDeleteMessage);
           confirmDeleteMessage=confirmDeleteMessage.replace("#1", numSelectedItems);
         }
@@ -589,7 +593,7 @@ function _SCDeleteListAsDirectory(directory, selectedDir) {
 
 function SCAbConfirmDeleteDirectory(selectedDir) {
     let confirmDeleteMessage;
-    
+
     let prefBranch = (Components.classes["@mozilla.org/preferences-service;1"]
           .getService(Components.interfaces.nsIPrefBranch));
 
@@ -838,19 +842,19 @@ function SCOnCategoriesContextMenuItemCommand(event) {
                 }
             }
             if (changed) {
-              
+
                 requireSync = true;
-                
+
                 card.setProperty("Categories", cats);
-                
+
                 let oldDavVersion=card.getProperty("groupDavVersion", "-1");
                 card.setProperty("groupDavVersion", "-1");
                 card.setProperty("groupDavVersionPrev", oldDavVersion);
-                
+
                 let abManager = Components.classes["@mozilla.org/abmanager;1"]
                                           .getService(Components.interfaces.nsIAbManager);
                 let ab = abManager.getDirectory(abUri);
-                
+
                 ab.modifyCard(card);
             }
         }
@@ -863,9 +867,9 @@ function SCOnCategoriesContextMenuItemCommand(event) {
 }
 
 function SCSetSearchCriteria(menuitem) {
-  
+
     let criteria = menuitem.getAttribute("sc-search-criteria");
-    
+
     if (criteria.length > 0) {
         gQueryURIFormat = "(or(" + criteria + ",c,@V))"; // the "or" is important here
     }
@@ -876,13 +880,13 @@ function SCSetSearchCriteria(menuitem) {
         // ABQueryUtils.jsm - remove leading "?" to migrate existing customized values for mail.addr_book.quicksearchquery.format
         if (nameOrEMailSearch.startsWith("?"))
           nameOrEMailSearch=nameOrEMailSearch.slice(1);
-          
+
         gQueryURIFormat = nameOrEMailSearch;
     }
-    
+
     gSearchInput.setAttribute("placeholder", menuitem.getAttribute("label"));
     gSearchInput.focus();
-    
+
     onEnterInSearchBar();
 }
 
